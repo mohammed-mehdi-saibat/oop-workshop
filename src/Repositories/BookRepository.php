@@ -44,6 +44,15 @@ class BookRepository
 
         return $book;
     }
+
+    public function save(Book $book): void
+    {
+        $db = Database::getInstance();
+
+        $sql = "INSERT INTO books (title, price, stock, author_id) VALUES (:title, :price, :stock, :author_id);";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['title' => $book->getTitle(), 'price' => $book->getPrice(), 'stock' => $book->getStock(), 'author_id' => $book->getAuthor()->getId()]);
+    }
 }
 
 $books = new BookRepository();
