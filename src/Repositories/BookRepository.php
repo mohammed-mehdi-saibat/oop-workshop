@@ -27,7 +27,24 @@ class BookRepository
 
         return $books;
     }
+
+    public function findByTitle(string $title): ?Book
+    {
+        $db = Database::getInstance();
+        $sql = "SELECT b.*, a.id as author_id, a.name as author_name, a.email as author_email FROM books b JOIN authors a ON b.author_id = a.id WHERE b.title = :title";
+        $stmt = $db->prepare($sql);
+        $stmt->execute(['title' => $title]);
+
+        $row = $stmt->fetch();
+
+        if (!$row) return null;
+
+        $author = new Author((int)$row['author_id'], $row['author_name'], $row['author_email']);
+        $book = new Book((int)$row['id'], $row['title'], (float)$row['price'], (int)$row['stock'], $author);
+
+        return $book;
+    }
 }
 
 $books = new BookRepository();
-print_r($books->findAll());
+print_r($books->findByTitle('The Clean Coder'));
